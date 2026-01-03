@@ -1,0 +1,1 @@
+"""Channels app placeholder package."""

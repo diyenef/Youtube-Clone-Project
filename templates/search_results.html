@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Search - {{ query }}{% endblock %}
+
+{% block content %}
+  <h2>Search results for "{{ query }}"</h2>
+
+  {% if results %}
+    <div class="grid">
+      {% for video in results %}
+        <a class="card" href="{% url 'video_detail' pk=video.pk %}">
+          {% if video.thumbnail %}
+            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+          {% else %}
+            <div class="thumb-placeholder">No thumbnail</div>
+          {% endif %}
+          <div class="meta">
+            <div class="title">{{ video.title }}</div>
+            <div class="channel">{{ video.channel.username }} • {{ video.uploaded_at|date:"M d, Y" }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+
+{% endblock %}

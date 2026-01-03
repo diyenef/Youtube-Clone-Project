@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - YouTube Clone{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <h2>Recommended</h2>
+  </div>
+
+  <!-- Main grid of regular videos -->
+  <div class="grid">
+    {% for video in videos %}
+      <article class="card">
+        <a class="thumb" href="{% url 'video_detail' pk=video.pk %}">
+          {% if video.thumbnail %}
+            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+          {% elif video.thumbnail_url %}
+            <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}">
+          {% else %}
+            <div class="thumb-placeholder">No thumbnail</div>
+          {% endif %}
+        </a>
+
+        <div class="card-body">
+          <a class="avatar" href="#">{{ video.channel.username|slice:":1"|upper }}</a>
+          <div class="card-info">
+            <a class="title" href="{% url 'video_detail' pk=video.pk %}">{{ video.title }}</a>
+            <div class="meta">{{ video.channel.username }} • {{ video.views }} views</div>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p>No videos yet — try uploading one.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Shorts / Reels row (moved below main grid) -->
+  <section class="shorts-section">
+    <h3 class="shorts-title">Shorts</h3>
+    <div class="shorts-row">
+      {% for s in shorts %}
+        <a class="short-card" href="{% url 'video_detail' pk=s.pk %}">
+          <span class="short-badge">SHORTS</span>
+          {% if s.file or s.external_url %}
+            <video class="short-preview" muted playsinline preload="metadata" poster="{% if s.thumbnail %}{{ s.thumbnail.url }}{% elif s.thumbnail_url %}{{ s.thumbnail_url }}{% endif %}" src="{% if s.file %}{{ s.file.url }}{% else %}{{ s.external_url }}{% endif %}"></video>
+          {% elif s.thumbnail %}
+            <img src="{{ s.thumbnail.url }}" alt="{{ s.title }}">
+          {% elif s.thumbnail_url %}
+            <img src="{{ s.thumbnail_url }}" alt="{{ s.title }}">
+          {% else %}
+            <div class="short-placeholder">Short</div>
+          {% endif %}
+          <div class="short-meta">
+            <span class="short-channel">{{ s.channel.username }}</span>
+            <span class="short-views">{{ s.views }} views</span>
+          </div>
+        </a>
+      {% empty %}
+        <div class="muted">No shorts yet</div>
+      {% endfor %}
+    </div>
+  </section>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ video.title }} - YouTube Clone{% endblock %}
+
+{% block content %}
+  <div class="video-layout">
+    <div class="player-wrap">
+    {% if video.file %}
+      <video controls class="player" src="{{ video.file.url }}"></video>
+    {% elif video.external_url %}
+      <video controls class="player" src="{{ video.external_url }}"></video>
+    {% else %}
+      <p>No video file available.</p>
+    {% endif %}
+    <h1 class="video-title">{{ video.title }}</h1>
+    <div class="video-meta">{{ video.views }} views • {{ video.uploaded_at|date:"M d, Y" }}</div>
+    <div class="description">{{ video.description }}</div>
+    </div>
+
+    <aside class="recommendations">
+      <h4>Up next</h4>
+      {% for v in recommended %}
+        <a class="rec-card" href="{% url 'video_detail' pk=v.pk %}">
+          {% if v.thumbnail %}
+            <img src="{{ v.thumbnail.url }}" alt="{{ v.title }}">
+          {% else %}
+            <div class="thumb-placeholder">No thumbnail</div>
+          {% endif %}
+          <div class="rec-meta">
+            <div class="title">{{ v.title }}</div>
+            <div class="channel">{{ v.channel.username }}</div>
+            <div class="views">{{ v.views }} views</div>
+          </div>
+        </a>
+      {% endfor %}
+    </aside>
+  </div>
+
+  <section class="comments">
+    <div class="video-actions">
+      {% if user.is_authenticated %}
+        <button id="like-btn" class="btn" data-video-id="{{ video.pk }}" data-liked="{% if user in video.likes.all %}1{% else %}0{% endif %}">
+          {% if user in video.likes.all %}Unlike{% else %}Like{% endif %} (<span id="like-count">{{ video.likes.count }}</span>)
+        </button>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn">Sign in to like</a>
+      {% endif %}
+    </div>
+
+    <h3>Comments</h3>
+    {% if user.is_authenticated %}
+      <form id="comment-form">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button class="btn" type="submit">Comment</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'login' %}">Sign in</a> to post a comment.</p>
+    {% endif %}
+
+    <div id="comments-list">
+      {% for comment in top_comments %}
+        <div class="comment" data-comment-id="{{ comment.id }}">
+          <strong>{{ comment.author.username }}</strong> - {{ comment.text }}
+          <div class="comment-actions">
+            {% if user.is_authenticated %}
+              <button class="reply-btn" data-parent-id="{{ comment.id }}">Reply</button>
+              <button class="flag-btn" data-comment-id="{{ comment.id }}">Flag</button>
+            {% endif %}
+          </div>
+          <div class="replies">
+            {% for reply in comment.replies.all %}
+              <div class="comment reply" data-comment-id="{{ reply.id }}">
+                <strong>{{ reply.author.username }}</strong> - {{ reply.text }}
+                <div class="comment-actions">
+                  {% if user.is_authenticated %}
+                    <button class="reply-btn" data-parent-id="{{ reply.id }}">Reply</button>
+                    <button class="flag-btn" data-comment-id="{{ reply.id }}">Flag</button>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% empty %}
+        <p>No comments yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+{% endblock %}

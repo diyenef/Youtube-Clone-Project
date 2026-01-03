@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - YouTube Clone{% endblock %}
+
+{% block content %}
+  <h2>Create account</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">Sign up</button>
+  </form>
+{% endblock %}

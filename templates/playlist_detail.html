@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ playlist.title }}{% endblock %}
+
+{% block content %}
+  <h2>{{ playlist.title }}</h2>
+  <p>{{ playlist.description }}</p>
+  <div class="grid">
+    {% for item in items %}
+      <article class="card">
+        <a class="thumb" href="{% url 'video_detail' pk=item.video.pk %}">
+          {% if item.video.thumbnail %}
+            <img src="{{ item.video.thumbnail.url }}" alt="{{ item.video.title }}">
+          {% else %}
+            <div class="thumb-placeholder">No thumbnail</div>
+          {% endif %}
+        </a>
+        <div class="card-body">
+          <a class="avatar">{{ item.video.channel.username|slice:":1"|upper }}</a>
+          <div class="card-info">
+            <a class="title" href="{% url 'video_detail' pk=item.video.pk %}">{{ item.video.title }}</a>
+            <div class="meta">{{ item.video.channel.username }} • {{ item.video.views }} views</div>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p>No videos in playlist.</p>
+    {% endfor %}
+  </div>
+
+{% endblock %}

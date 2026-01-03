@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Watch Later{% endblock %}
+
+{% block content %}
+  <h2>Watch Later</h2>
+  <div class="grid">
+    {% for video in videos %}
+      <article class="card">
+        <a class="thumb" href="{% url 'video_detail' pk=video.pk %}">
+          {% if video.thumbnail %}
+            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}">
+          {% else %}
+            <div class="thumb-placeholder">No thumbnail</div>
+          {% endif %}
+        </a>
+        <div class="card-body">
+          <a class="avatar">{{ video.channel.username|slice:":1"|upper }}</a>
+          <div class="card-info">
+            <a class="title" href="{% url 'video_detail' pk=video.pk %}">{{ video.title }}</a>
+            <div class="meta">{{ video.channel.username }} • {{ video.views }} views</div>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p>No items in Watch Later.</p>
+    {% endfor %}
+  </div>
+
+{% endblock %}
